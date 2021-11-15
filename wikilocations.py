@@ -84,7 +84,10 @@ def dms_to_loc(str, mode = "ca"):
         new = str.replace(u'°',' ').replace('′',' ').replace('″',' ')
     elif mode == "eo":
         direction = {'N':1, 'S':-1, 'O': 1, 'U':-1}
-        new = str.replace(u'°',' ').replace('′',' ').replace('″',' ')     
+        new = str.replace(u'°',' ').replace('′',' ').replace('″',' ')
+    elif mode == "gl":
+        direction = {'N':1, 'S':-1, 'L': 1, 'O':-1}
+        new = str.replace(u'°',' ').replace('′',' ').replace('″',' ')
     else:
         raise Exception("Not implemented yet")
     new = new.split()
@@ -124,11 +127,12 @@ def parse_locations_eu(obj, verbose = False):
 
 def build_url(language, verbose):
     url = "https://{}.wikipedia.org/wiki/Special:Random".format(language)
-    ca_like_lan = ["ca", "es", "gl"]
+    ca_like_lan = ["ca", "es"]
     it_like_lan = ["it"]
     eu_like_lan = ["eu", "fr"]
     de_like_lan = ["de"]
     eo_like_lan = ["eo"]
+    gl_like_lan = ["gl"]
     if (language in ca_like_lan):
         w_page = CatalanWikiPage(url, verbose)
     elif (language in eu_like_lan):
@@ -138,7 +142,9 @@ def build_url(language, verbose):
     elif (language in it_like_lan):
         w_page = CatalanWikiPage(url, verbose, mode = "it")
     elif (language in eo_like_lan):
-        w_page = CatalanWikiPage(url, verbose, mode = "eo")      
+        w_page = CatalanWikiPage(url, verbose, mode = "eo")
+    elif (language in gl_like_lan):
+        w_page = CatalanWikiPage(url, verbose, mode = "gl")      
     else:
         raise Exception("Not implemented yet")
     return w_page
