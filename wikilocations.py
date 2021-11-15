@@ -15,6 +15,11 @@ class WikiPage(object):
     def __init__(self, url, verbose = False):
         self.url_or = url
         page = requests.get(url)
+        ## this is for the Basque wiki only I think, it has this
+        ## weird thing
+        if "Txikipedia" in page.url:
+            url = page.url.replace("Txikipedia:", "")
+            page = requests.get(url)
         self.url = page.url
         if verbose:
             print(page)
@@ -94,6 +99,8 @@ def dms_to_loc(str, mode = "ca"):
     new_dir = new.pop()
     if mode == "de" and len(new) == 3:
         new[2] = new[2].replace(',','.')
+    if mode == "de" and len(new) == 1:
+        new[0] = new[0].replace(',','.')
     new.extend([0,0,0])
     try:
         return (float(new[0])+float(new[1])/60.0+float(new[2])/3600.0) * direction[new_dir]
@@ -167,7 +174,7 @@ def main_wrk(target, language, output, verbose):
         tmp_loc = w_page.get_locations(verbose=verbose)
         pbar.update(len(tmp_loc))
         locations += tmp_loc
-        time.sleep(.5)
+        time.sleep(.1)
     pbar.close()
     with open(output, 'w') as f:
         json.dump(locations, f)
