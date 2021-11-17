@@ -8,6 +8,7 @@ import json
 import pdb
 from tqdm import tqdm
 import click
+import random
 
 ## FUNS
 
@@ -32,7 +33,7 @@ class CatalanWikiPage(WikiPage):
     def __init__(self, url, verbose = False, mode = "ca"):
         super().__init__(url, verbose)
         self.mode = mode
-    def get_locations(self, verbose = False):
+    def get_locations(self, singleLoc=True, verbose = False):
         geo_info = self.soup.find_all("span", class_="geo-dms")
         geo_info_set = set(geo_info)
         if verbose:
@@ -40,12 +41,14 @@ class CatalanWikiPage(WikiPage):
             print(len(geo_info))
         geo_info_unset = list(geo_info_set)
         locations = [parse_locations(i.text, verbose=verbose, mode=self.mode) for i in geo_info_unset]
+        if singleLoc:
+            locations = random.choice(locations)
         if verbose:
             print(locations)
         return locations
 
 class BasqueWikiPage(WikiPage):
-    def get_locations(self, verbose = False):
+    def get_locations(self, singleLoc=True, verbose = False):
         geo_info = self.soup.find_all("a", class_="mw-kartographer-maplink")
         geo_info_set = set(geo_info)
         if verbose:
@@ -53,10 +56,12 @@ class BasqueWikiPage(WikiPage):
             print(len(geo_info))
         geo_info_unset = list(geo_info_set)
         locations = [parse_locations_eu(i, verbose=verbose) for i in geo_info_unset]
+        if singleLoc:
+            locations = random.choice(locations)    
         return locations
 
 class GermanWikiPage(WikiPage):
-    def get_locations(self, verbose = False):
+    def get_locations(self, singleLoc = True, verbose = False):
         long_arr = self.soup.find_all("span",attrs={"title":"Breitengrad"})
         lat_arr = self.soup.find_all("span",attrs={"title":"Längengrad"})
         if len(lat_arr) != len(long_arr):
@@ -71,6 +76,8 @@ class GermanWikiPage(WikiPage):
             print(len(geo_info))
         geo_info_unset = list(geo_info_set)
         locations = [parse_locations(i, verbose=verbose, mode="de") for i in geo_info_unset]
+        if singleLoc:
+            locations = random.choice(locations)
         if verbose:
             print(locations)
         return locations
@@ -181,4 +188,3 @@ def main_wrk(target, language, output, verbose):
 
 if __name__ == "__main__":
     main_wrk()
-
