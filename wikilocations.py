@@ -41,7 +41,7 @@ class CatalanWikiPage(WikiPage):
             print(len(geo_info))
         geo_info_unset = list(geo_info_set)
         locations = [parse_locations(i.text, verbose=verbose, mode=self.mode) for i in geo_info_unset]
-        if singleLoc:
+        if singleLoc and len(locations) > 0:
             locations = random.choice(locations)
         if verbose:
             print(locations)
@@ -56,7 +56,7 @@ class BasqueWikiPage(WikiPage):
             print(len(geo_info))
         geo_info_unset = list(geo_info_set)
         locations = [parse_locations_eu(i, verbose=verbose) for i in geo_info_unset]
-        if singleLoc:
+        if singleLoc and len(locations) > 0:
             locations = random.choice(locations)    
         return locations
 
@@ -76,7 +76,7 @@ class GermanWikiPage(WikiPage):
             print(len(geo_info))
         geo_info_unset = list(geo_info_set)
         locations = [parse_locations(i, verbose=verbose, mode="de") for i in geo_info_unset]
-        if singleLoc:
+        if singleLoc and len(locations) > 0:
             locations = random.choice(locations)
         if verbose:
             print(locations)
