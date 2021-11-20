@@ -28,7 +28,6 @@ class WikiPage(object):
         soup = BeautifulSoup(page.content, "html.parser")
         self.soup = soup
 
-
 class CatalanWikiPage(WikiPage):
     def __init__(self, url, verbose = False, mode = "ca"):
         super().__init__(url, verbose)
@@ -179,8 +178,9 @@ def main_wrk(target, language, output, verbose):
     while len(locations) < target:
         w_page = build_url(language, verbose=verbose)
         tmp_loc = w_page.get_locations(verbose=verbose)
-        pbar.update(len(tmp_loc))
-        locations += tmp_loc
+        if len(tmp_loc) > 0:
+            locations.append(tmp_loc)
+            pbar.update(1)
         time.sleep(.1)
     pbar.close()
     with open(output, 'w') as f:
