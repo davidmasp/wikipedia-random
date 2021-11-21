@@ -11,6 +11,25 @@ import click
 import random
 
 ## FUNS
+def generate_random_urls(languange, 
+                         n_urls = 100,
+                         verbose = False):
+    base_url = "https://{}.wikipedia.org/wiki/{}"
+    S = requests.Session()
+    URL = "https://{}.wikipedia.org/w/api.php".format(languange)
+    rnlimit = "{}".format(n_urls)
+    PARAMS = {
+        "action": "query",
+        "format": "json",
+        "list": "random",
+        "rnnamespace" : "0",
+        "rnlimit": rnlimit
+    }
+    R = S.get(url=URL, params=PARAMS)
+    DATA = R.json()
+    RANDOMS = DATA["query"]["random"]
+    url_list = [base_url.format(languange, i["title"]) for i in RANDOMS]
+    return url_list
 
 class WikiPage(object):
     def __init__(self, url, verbose = False):
@@ -138,8 +157,11 @@ def parse_locations_eu(obj, verbose = False):
     }
     return obj_ret
 
-def build_url(language, verbose):
-    url = "https://{}.wikipedia.org/wiki/Special:Random".format(language)
+def build_url(language, url=None, verbose = False):
+    if url is None:
+        ## this should not be used according to Robots.txt
+        ## in the main fun it shouldn't lead here anymore
+        url = "https://{}.wikipedia.org/wiki/Special:Random".format(language)
     ca_like_lan = ["ca", "es"]
     it_like_lan = ["it"]
     eu_like_lan = ["eu", "fr"]
@@ -172,11 +194,20 @@ def main_wrk(target, language, output, verbose):
     """
     The main function of the script, needed for click_
     """
+    # 500 is the max number of random pages
+    raw_locations = generate_random_urls(languange=language, n_urls=50)
+    print(len(raw_locations))
     locations = []
     pbar = tqdm(total = target)
     # get_locations("https://ca.wikipedia.org/wiki/Barcelona", verbose=True)
     while len(locations) < target:
-        w_page = build_url(language, verbose=verbose)
+        if len(raw_locations) == 0:
+            if verbose:
+                print("Re-generating random urls")
+            raw_locations = generate_random_urls(languange=language, n_urls=50)
+        page_url = raw_locations.pop()
+        print(len(raw_locations))
+        w_page = build_url(language, url = page_url, verbose=verbose)
         tmp_loc = w_page.get_locations(verbose=verbose)
         if len(tmp_loc) > 0:
             locations.append(tmp_loc)
